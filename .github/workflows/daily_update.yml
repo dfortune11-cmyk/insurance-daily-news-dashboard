@@ -1,0 +1,26 @@
+name: Daily Insurance News Update
+on:
+  schedule:
+    - cron: '0 23 * * *' # 한국 시간 오전 8시 (UTC 23:00)
+  workflow_dispatch: # 수동 실행 버튼 생성
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install -r requirements.txt
+      - name: Update News
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+        run: python update_daily_news.py
+      - name: Push results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.html
+          git commit -m "Auto-update: Daily News Briefing" || echo "No changes"
+          git push
