@@ -18,7 +18,8 @@ def get_current_date():
 def fetch_insurance_news():
     print("Fetching insurance news...", flush=True)
     url = "https://api.search.brave.com/res/v1/web/search"
-    query = f"보험 업계 신규 정책 뉴스 {get_current_date()}"
+    today = get_current_date()
+    query = f"보험 업계 신규 정책 뉴스 {today}"
     headers = {
         "Accept": "application/json",
         "Accept-Encoding": "gzip",
@@ -28,13 +29,21 @@ def fetch_insurance_news():
     
     try:
         response = requests.get(url, headers=headers, params=params, timeout=10)
+        results = []
         if response.status_code == 200:
             results = response.json().get("web", {}).get("results", [])
-            print(f"Successfully fetched {len(results)} news items.", flush=True)
-            return results
-        else:
-            print(f"Brave Search Error: {response.status_code}", flush=True)
-            return []
+            print(f"Initial search for {today} found {len(results)} items.", flush=True)
+        
+        # 만약 검색 결과가 너무 적으면, 좀 더 포괄적으로 검색 시도
+        if len(results) < 3:
+            print("Few results found. Trying a broader search...", flush=True)
+            params["q"] = "보험 업계 최신 핵심 뉴스 브리핑"
+            response = requests.get(url, headers=headers, params=params, timeout=10)
+            if response.status_code == 200:
+                results = response.json().get("web", {}).get("results", [])
+                print(f"Broader search found {len(results)} items.", flush=True)
+
+        return results
     except Exception as e:
         print(f"Brave Search Request Failed: {e}", flush=True)
         return []
