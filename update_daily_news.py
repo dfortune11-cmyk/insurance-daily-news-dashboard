@@ -16,7 +16,7 @@ def get_current_date():
     return now.strftime("%Y-%m-%d")
 
 def fetch_insurance_news():
-    print("Fetching insurance news...")
+    print("Fetching insurance news...", flush=True)
     url = "https://api.search.brave.com/res/v1/web/search"
     query = f"보험 업계 신규 정책 뉴스 {get_current_date()}"
     headers = {
@@ -26,20 +26,26 @@ def fetch_insurance_news():
     }
     params = {"q": query, "count": 10}
     
-    response = requests.get(url, headers=headers, params=params)
-    if response.status_code == 200:
-        return response.json().get("web", {}).get("results", [])
-    else:
-        print(f"Brave Search Error: {response.status_code}")
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=10)
+        if response.status_code == 200:
+            results = response.json().get("web", {}).get("results", [])
+            print(f"Successfully fetched {len(results)} news items.", flush=True)
+            return results
+        else:
+            print(f"Brave Search Error: {response.status_code}", flush=True)
+            return []
+    except Exception as e:
+        print(f"Brave Search Request Failed: {e}", flush=True)
         return []
 
 def generate_news_entry(news_results):
-    print("Generating news entry using Gemini...")
+    print("Generating news entry using Gemini...", flush=True)
     genai.configure(api_key=GEMINI_API_KEY)
     
-    # 모델 설정 (Gemini 3 Pro Preview 사용 시도, 안되면 1.5 Pro/2.0 Flash 등 사용)
+    # 모델 설정 (Gemini 1.5 Flash가 빠르므로 우선 사용 시도)
     try:
-        model = genai.GenerativeModel("gemini-3-pro-preview")
+        model = genai.GenerativeModel("gemini-1.5-flash")
     except:
         model = genai.GenerativeModel("gemini-1.5-pro")
 
@@ -63,21 +69,32 @@ def generate_news_entry(news_results):
     응답은 반드시 순수 JSON 배열이어야 하며, 다른 설명은 포함하지 마.
     """
 
-    response = model.generate_content(prompt)
     try:
+        response = model.generate_content(prompt)
+        print("Gemini response received.", flush=True)
         # JSON 문자열 추출 (마크다운 코드 블록 제거 등)
-        json_str = re.search(r'\[.*\]', response.text, re.DOTALL).group()
-        return json.loads(json_str)
+        match = re.search(r'\[.*\]', response.text, re.DOTALL)
+        if match:
+            json_str = match.group()
+            return json.loads(json_str)
+        else:
+            print(f"JSON structure not found in Gemini response: {response.text[:100]}...", flush=True)
+            return None
     except Exception as e:
-        print(f"Gemini Response Parsing Error: {e}")
+        print(f"Gemini API or Parsing Error: {e}", flush=True)
         return None
 
 def update_index_html(new_entry):
     date_str = get_current_date()
-    print(f"Updating index.html with news for {date_str}...")
+    print(f"Updating index.html with news for {date_str}...", flush=True)
     
     with open(REPO_PATH, "r", encoding="utf-8") as f:
         content = f.read()
+
+    # 이미 해당 날짜의 데이터가 존재한다면 업데이트 하지 않음 (중복 방지)
+    if f'"{date_str}":' in content:
+        print(f"News for {date_str} already exists. Skipping update.", flush=True)
+        return
 
     # NEWS_DATABASE 객체를 찾아 새로운 데이터 삽입
     new_data_json = json.dumps(new_entry, ensure_ascii=False, indent=16)
@@ -87,11 +104,11 @@ def update_index_html(new_entry):
 
     with open(REPO_PATH, "w", encoding="utf-8") as f:
         f.write(updated_content)
-    print("Update complete!")
+    print("Update complete!", flush=True)
 
 if __name__ == "__main__":
     if not GEMINI_API_KEY or not BRAVE_API_KEY:
-        print("Error: environment variables GEMINI_API_KEY or BRAVE_API_KEY not set.")
+        print("Error: environment variables GEMINI_API_KEY or BRAVE_API_KEY not set.", flush=True)
     else:
         news = fetch_insurance_news()
         if news:
@@ -99,6 +116,6 @@ if __name__ == "__main__":
             if entry:
                 update_index_html(entry)
             else:
-                print("Failed to generate news entry.")
+                print("Failed to generate news entry.", flush=True)
         else:
-            print("No news found to update.")
+            print("No news found to update.", flush=True)
