@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>안프로의 보험 핵심 뉴스 브리핑</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            border-color: #3b82f6;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .archive-item.active {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            font-weight: 700;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .commentary {
+            border-left: 4px solid #3b82f6;
+            background: #f1f5f9;
+        }
+
+        /* Search Clear Button Visibility */
+        .search-clear {
+            display: none;
+        }
+
+        .search-input:not(:placeholder-shown)+.search-clear {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md">
+        <div class="container mx-auto px-4 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-xl shadow-lg">
+                    <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight gradient-text">안프로의 보험 핵심 뉴스 브리핑</h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Desktop Search -->
+                <div class="relative hidden sm:block">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="searchInput" placeholder="키워드 검색..."
+                        class="search-input pl-10 pr-10 py-2 bg-slate-100 border-none rounded-full text-sm w-48 lg:w-64 focus:ring-2 focus:ring-blue-500 transition-all outline-none">
+                    <button id="clearSearch"
+                        class="search-clear absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-200 rounded-full transition-colors">
+                        <i data-lucide="x" class="w-3 h-3 text-slate-500"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-grow container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+
+        <!-- Sidebar: Archive List -->
+        <aside class="w-full md:w-64 flex-shrink-0">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border sticky top-28">
+                <div class="flex items-center gap-2 mb-6">
+                    <i data-lucide="archive" class="w-5 h-5 text-blue-600"></i>
+                    <h2 class="font-bold text-lg">히스토리</h2>
+                </div>
+                <div id="dateList" class="space-y-1">
+                    <!-- Dates will be injected here -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <section class="flex-grow">
+            <!-- Mobile Search -->
+            <div class="relative sm:hidden mb-6">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input type="text" id="searchInputMobile" placeholder="키워드 검색..."
+                    class="search-input pl-10 pr-10 py-3 bg-white border rounded-2xl text-sm w-full focus:ring-2 focus:ring-blue-500 outline-none shadow-sm">
+                <button id="clearSearchMobile"
+                    class="search-clear absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-slate-100 rounded-full transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-slate-500"></i>
+                </button>
+            </div>
+
+            <div class="mb-8 flex items-end justify-between">
+                <div>
+                    <h2 id="currentDateTitle" class="text-3xl font-extrabold text-slate-900 mb-2">2026년 2월 19일</h2>
+                    <p id="resultCount" class="text-slate-500 text-sm italic">총 5개의 브리핑이 있습니다.</p>
+                </div>
+                <div class="hidden md:block">
+                    <span
+                        class="badge bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Premium
+                        Insight</span>
+                </div>
+            </div>
+
+            <!-- News Grid -->
+            <div id="newsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- News Cards will be injected here -->
+            </div>
+
+            <!-- No Results -->
+            <div id="noResults" class="hidden py-24 text-center">
+                <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="search-x" class="text-slate-400 w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">검색 결과가 없습니다.</h3>
+                <p class="text-slate-500">다른 키워드로 검색해 보시겠어요?</p>
+            </div>
+        </section>
+    </div>
+
+    <footer class="mt-12 border-t py-12 bg-white">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-slate-500 text-sm mb-2">© 2026 안프로의 보험 핵심 뉴스 브리핑. All Rights Reserved.</p>
+            <p class="text-slate-400 text-xs">본 페이지는 마스터 풍 AI 비서에 의해 자동 관리됩니다.</p>
+        </div>
+    </footer>
+
+    <!-- Data & Script -->
+    <script>
+        // 뉴스 데이터베이스
+        const NEWS_DATABASE = {
+            "2026-02-19": [
+                {
+                    category: "NEW POLICY",
+                    icon: "activity",
+                    title: "5세대 실손보험 출시 예고: 보험료 낮추고 비급여 '도수치료' 보장 축소",
+                    details: [
+                        "금융위원회가 보험료는 낮춘 대신 비급여 항목인 도수치료, 영양제 주사 등의 보장을 대폭 축소한 '5세대 실손보험' 출시를 추진합니다.",
+                        "무분별한 의료 쇼핑을 막기 위해 비급여 항목의 본인 부담률을 높이고, 과잉 진료가 잦은 항목에 대해서는 연간 이용 횟수를 제한합니다.",
+                        "저렴한 보험료를 원하는 젊은 층에게는 유리할 수 있으나, 병원 이용이 잦은 가입자에게는 보장 공백이 발생할 수 있습니다."
+                    ],
+                    insight: "보험의 본질인 '보장'과 '가격' 사이의 고민이 깊어지는 시점, 의료 습관에 따른 현명한 갈아타기가 필요합니다.",
+                    link: "https://www.ftoday.co.kr/news/articleView.html?idxno=355367"
+                },
+                {
+                    category: "MARKET TREND",
+                    icon: "trending-up",
+                    title: "2026년 실손보험료 평균 7.8% 인상 확정… 4세대는 최대 20% 상승 전망",
+                    details: [
+                        "2026년 실손의료보험 전체 평균 인상률이 7.8%로 결정되었으며, 특히 4세대 실손의 경우 최대 20%까지 오를 것으로 예고되었습니다.",
+                        "비급여 진료비 급증과 보험 사기 등으로 인한 누적 적자가 이번 인상의 주요 원인으로 지적되고 있습니다.",
+                        "4세대 가입자들의 부담이 커짐에 따라 고정비 지출을 줄이려는 소비자들의 보험 리모델링 문의가 급증할 것으로 보입니다."
+                    ],
+                    insight: "실손보험의 '적자 늪'이 가입자의 주머니를 직접 타격하기 시작했습니다. 가계 예산 재점검이 필수적인 시기입니다.",
+                    link: "https://www.hankookilbo.com/News/Read/A2025122317420002561"
+                },
+                {
+                    category: "AI TECH",
+                    icon: "bot",
+                    title: "라이나생명, 업계 최초 'AI 텔레마케터' 서비스 운영 개시",
+                    details: [
+                        "라이나생명이 인공지능이 직접 보험 상품을 설명하고 가입을 권유하는 AI 텔레마케터 서비스를 정식 도입했습니다.",
+                        "단순 상담을 넘어 계약 체결 과정까지 AI가 담당하며, 표준 스크립트 준수를 통해 불완전 판매 위험을 보완했습니다.",
+                        "보험업계의 AX(AI Transformation) 경쟁이 실물 영업 현장으로 전면 확대되는 신호탄이 될 것으로 보입니다."
+                    ],
+                    insight: "AI가 보험 영업의 주역으로 등장하면서, 설계사는 '단순 판매'가 아닌 '복합 컨퍼런스'로 전문성을 증명해야 합니다.",
+                    link: "https://www.hankyung.com/finance/article/20260219AIEX"
+                },
+                {
+                    category: "REGULATION",
+                    icon: "shield-alert",
+                    title: "비급여 '관리급여' 제도 도입: 도수치료 등에 본인 부담률 95% 검토",
+                    details: [
+                        "정부가 과잉 진료가 잦은 비급여 항목에 대해 본인 부담률을 95%까지 높이는 '관리급여' 제도 도입을 검토 중입니다.",
+                        "이는 실손보험의 적자 원인인 비급여 진료를 정부 차원에서 강력하게 통제하겠다는 선언입니다.",
+                        "제도 도입 시 보험사의 손해율은 개선되겠으나, 소비자의 실질적인 보장 혜택은 크게 축소될 우려가 있습니다."
+                    ],
+                    insight: "비급여 시장에 대한 '정부발 강력 규제'의 시작입니다. 실손보험의 지속 가능성을 위한 극약처방일 수 있습니다.",
+                    link: "https://www.yakup.com/news/index.html?mode=view&pmode=&cat=&cat2=&nid=300000"
+                },
+                {
+                    category: "NEW PRODUCT",
+                    icon: "brain",
+                    title: "금융위, '치매·노후 대비' 특화 보험 강화 추진… 간병 연계형 주목",
+                    details: [
+                        "금융위원회가 초고령 사회에 대비해 치매 간병 및 노후 소득 보장을 강화한 특화 보험 상품 개발을 지원합니다.",
+                        "간병 서비스와 연계된 현물 급여형 상품 비중을 높이고, 세제 혜택 등 정책적 인센티브를 확대할 계획입니다.",
+                        "시니어 층의 실질적인 수요에 맞춘 맞춤형 보장 구조로의 패러다임 전환이 예상됩니다."
+                    ],
+                    insight: "단순 치료비 보장을 넘어 실질적인 '돌봄'과 '생활 지원'을 결합한 시니어 프리미엄 시장이 활성화를 앞두고 있습니다.",
+                    link: "https://news.nate.com/view/20251219n26245"
+                }
+            ],
+            "2026-02-18": [
+                {
+                    category: "NEWS",
+                    icon: "newspaper",
+                    title: "보험사 2025년 결산 실적 발표: 역대 최대 이익 달성",
+                    details: ["주요 보험사들이 작년 한 해 역대 최대 규모의 이익을 달성하며 성장세를 이어가고 있습니다."],
+                    insight: "실적 호조 속에서 사회적 책임과 상생 금융에 대한 목소리도 커질 전망입니다.",
+                    link: "#"
+                }
+            ]
+        };
+
+        let selectedDate = "2026-02-19";
+        let searchQuery = "";
+
+        const searchInput = document.getElementById('searchInput');
+        const searchInputMobile = document.getElementById('searchInputMobile');
+        const clearBtn = document.getElementById('clearSearch');
+        const clearBtnMobile = document.getElementById('clearSearchMobile');
+
+        function init() {
+            renderDateList();
+            renderNews();
+
+            searchInput.addEventListener('input', e => {
+                searchQuery = e.target.value.toLowerCase();
+                searchInputMobile.value = searchQuery;
+                renderNews();
+            });
+
+            searchInputMobile.addEventListener('input', e => {
+                searchQuery = e.target.value.toLowerCase();
+                searchInput.value = searchQuery;
+                renderNews();
+            });
+
+            clearBtn.onclick = clearSearchNow;
+            clearBtnMobile.onclick = clearSearchNow;
+
+            lucide.createIcons();
+        }
+
+        function clearSearchNow() {
+            searchQuery = "";
+            searchInput.value = "";
+            searchInputMobile.value = "";
+            renderNews();
+        }
+
+        function renderDateList() {
+            const dateList = document.getElementById('dateList');
+            dateList.innerHTML = "";
+            const dates = Object.keys(NEWS_DATABASE).sort().reverse();
+
+            dates.forEach(date => {
+                const btn = document.createElement('button');
+                btn.className = `archive-item w-full text-left px-4 py-3 rounded-xl text-sm transition-all flex items-center justify-between ${date === selectedDate ? 'active' : 'hover:bg-slate-50'}`;
+                btn.innerHTML = `
+                    <span>${date}</span>
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                `;
+                btn.onclick = () => {
+                    selectedDate = date;
+                    renderDateList();
+                    renderNews();
+                };
+                dateList.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function renderNews() {
+            const grid = document.getElementById('newsGrid');
+            const noResults = document.getElementById('noResults');
+            const resultCount = document.getElementById('resultCount');
+            const title = document.getElementById('currentDateTitle');
+
+            const [y, m, d] = selectedDate.split('-');
+            title.textContent = `${y}년 ${m}월 ${d}일`;
+
+            let filteredItems = NEWS_DATABASE[selectedDate] || [];
+
+            if (searchQuery) {
+                filteredItems = [];
+                Object.keys(NEWS_DATABASE).forEach(date => {
+                    const matched = NEWS_DATABASE[date].filter(item =>
+                        item.title.toLowerCase().includes(searchQuery) ||
+                        item.insight.toLowerCase().includes(searchQuery) ||
+                        item.details.some(d => d.toLowerCase().includes(searchQuery))
+                    );
+                    filteredItems.push(...matched);
+                });
+                title.textContent = `검색 결과: "${searchQuery}"`;
+            }
+
+            grid.innerHTML = "";
+
+            if (filteredItems.length === 0) {
+                grid.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                resultCount.textContent = "검색 결과가 없습니다.";
+            } else {
+                grid.classList.remove('hidden');
+                noResults.classList.add('hidden');
+                resultCount.textContent = `총 ${filteredItems.length}개의 브리핑이 있습니다.`;
+
+                filteredItems.forEach(item => {
+                    const card = document.createElement('article');
+                    card.className = "glass-card rounded-2xl overflow-hidden flex flex-col";
+                    card.innerHTML = `
+                        <div class="p-6 flex-grow">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="badge bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-bold tracking-widest">${item.category}</span>
+                                <i data-lucide="${item.icon}" class="text-blue-500 w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4 leading-tight">${item.title}</h3>
+                            <ul class="space-y-3 text-slate-600 text-sm mb-6">
+                                ${item.details.map(d => `
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-blue-500 mt-1 flex-shrink-0"></i>
+                                        <span>${d}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                            <div class="commentary p-4 rounded-r-xl">
+                                <p class="text-[13px] font-medium text-slate-800 leading-relaxed italic">
+                                    "${item.insight}"
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-4 border-t bg-slate-50/50">
+                            <a href="${item.link}" target="_blank" class="flex items-center justify-center gap-2 text-blue-600 font-bold text-xs hover:underline">
+                                자세히 보기 <i data-lucide="external-link" class="w-3 h-3"></i>
+                            </a>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+            lucide.createIcons();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>
