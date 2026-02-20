@@ -3,8 +3,10 @@ import sys
 import json
 import re
 import datetime
+import time
 from google import generativeai as genai
 import requests
+from google.api_core import exceptions
 
 # 설정
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -54,13 +56,11 @@ def generate_news_entry(news_results):
     print("Generating news entry using Gemini...", flush=True)
     genai.configure(api_key=GEMINI_API_KEY)
     
+    # 2026-02-20 Update: Removed non-existent models and added rate limit handling
     models_to_try = [
-        "gemini-3.0-pro",       # 사용자가 요청한 최신 모델 (혹시 API 열려있으면 시도)
-        "gemini-3.0-flash",     # 사용자가 요청한 최신 모델
-        "gemini-2.0-pro-exp",   # 최신 실험적 Pro 모델
-        "gemini-2.0-flash",     # 최신 & 빠름
-        "gemini-1.5-pro",       # 고성능 (안정적)
-        "gemini-1.5-flash",     # 가성비 & 빠름
+        "gemini-2.0-flash",     # 최신 & 빠름 (가장 안정적)
+        "gemini-1.5-pro",       # 고성능
+        "gemini-1.5-flash",     # 가성비
     ]
     model = None
     response = None
@@ -70,7 +70,6 @@ def generate_news_entry(news_results):
             print(f"Trying Gemini model: {model_name}...", flush=True)
             model = genai.GenerativeModel(model_name)
             
-            # Prompt definition (moved inside or kept outside not important, but using same prompt)
             prompt = f"""
             아래는 오늘 날짜({get_current_date()})의 보험 관련 뉴스 검색 결과이다.
             이 내용들을 바탕으로 '안프로의 보험 핵심 뉴스 브리핑'에 들어갈 5개의 핵심 뉴스 항목을 JSON 배열 형태로 생성해줘.
@@ -94,6 +93,10 @@ def generate_news_entry(news_results):
             response = model.generate_content(prompt)
             print(f"Success with {model_name}.", flush=True)
             break # Success, exit loop
+        except exceptions.ResourceExhausted:
+            print(f"Rate limit exceeded for {model_name}. Waiting 10s...", flush=True)
+            time.sleep(10)
+            continue # Try next model
         except Exception as e:
             print(f"Failed with {model_name}: {e}", flush=True)
             continue # Try next model
@@ -120,6 +123,7 @@ def generate_news_entry(news_results):
 
 def update_index_html(new_entry):
     date_str = get_current_date()
+    # For testing, ensure we don't duplicate logic but file check handles it.
     print(f"Updating index.html with news for {date_str}...", flush=True)
     
     with open(REPO_PATH, "r", encoding="utf-8") as f:
@@ -132,6 +136,10 @@ def update_index_html(new_entry):
 
     # NEWS_DATABASE 객체를 찾아 새로운 데이터 삽입
     new_data_json = json.dumps(new_entry, ensure_ascii=False, indent=16)
+    # Insert at the beginning of the object (right after '{') or specific marker?
+    # The previous regex logic: re.sub(r'(const NEWS_DATABASE = \{)', r'\1\n            ' + insertion_text, content)
+    # This inserts it at the top, which is good.
+    
     insertion_text = f'"{date_str}": {new_data_json},\n            '
     
     updated_content = re.sub(r'(const NEWS_DATABASE = \{)', r'\1\n            ' + insertion_text, content)
