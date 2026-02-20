@@ -55,8 +55,9 @@ def generate_news_entry(news_results):
     genai.configure(api_key=GEMINI_API_KEY)
     
     models_to_try = [
+        "gemini-2.0-pro-exp",   # 최신 실험적 Pro 모델 (가장 똑똑함)
         "gemini-2.0-flash",     # 최신 & 빠름
-        "gemini-1.5-pro",       # 고성능
+        "gemini-1.5-pro",       # 고성능 (안정적)
         "gemini-1.5-flash",     # 가성비 & 빠름
     ]
     model = None
