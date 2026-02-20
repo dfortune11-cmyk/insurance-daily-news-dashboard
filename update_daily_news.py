@@ -47,6 +47,7 @@ def fetch_insurance_news():
         return results
     except Exception as e:
         print(f"Brave Search Request Failed: {e}", flush=True)
+        sys.exit(1)  # Force fail on API error
         return []
 
 def generate_news_entry(news_results):
@@ -89,9 +90,11 @@ def generate_news_entry(news_results):
             return json.loads(json_str)
         else:
             print(f"JSON structure not found in Gemini response: {response.text[:100]}...", flush=True)
+            sys.exit(1) # Fail if JSON parsing fails
             return None
     except Exception as e:
         print(f"Gemini API or Parsing Error: {e}", flush=True)
+        sys.exit(1) # Fail on Gemini Error
         return None
 
 def update_index_html(new_entry):
@@ -128,5 +131,6 @@ if __name__ == "__main__":
                 update_index_html(entry)
             else:
                 print("Failed to generate news entry.", flush=True)
+                sys.exit(1)
         else:
             print("No news found to update.", flush=True)
