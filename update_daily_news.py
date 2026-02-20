@@ -54,47 +54,61 @@ def generate_news_entry(news_results):
     print("Generating news entry using Gemini...", flush=True)
     genai.configure(api_key=GEMINI_API_KEY)
     
-    # 모델 설정 (Gemini 1.5 Flash가 빠르므로 우선 사용 시도)
-    try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-    except:
-        model = genai.GenerativeModel("gemini-1.5-pro")
+    models_to_try = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
+    model = None
+    response = None
 
-    prompt = f"""
-    아래는 오늘 날짜({get_current_date()})의 보험 관련 뉴스 검색 결과이다.
-    이 내용들을 바탕으로 '안프로의 보험 핵심 뉴스 브리핑'에 들어갈 5개의 핵심 뉴스 항목을 JSON 배열 형태로 생성해줘.
-    
-    각 뉴스 항목은 다음 형식을 따라야 해:
-    {{
-        "category": "영문 카테고리 (예: NEW POLICY, MARKET TREND, AI TECH, REGULATION, NEW PRODUCT)",
-        "icon": "Lucide 아이콘 이름 (예: activity, trending-up, bot, shield-alert, brain)",
-        "title": "기사의 핵심을 찌르는 임팩트 있는 제목 (한국어)",
-        "details": ["내용 요약 1", "내용 요약 2", "내용 요약 3"],
-        "insight": "전문가로서의 통찰력이 담긴 한 줄 평 (대표님께 조언하는 스타일)",
-        "link": "기사 원문 URL"
-    }}
+    for model_name in models_to_try:
+        try:
+            print(f"Trying Gemini model: {model_name}...", flush=True)
+            model = genai.GenerativeModel(model_name)
+            
+            # Prompt definition (moved inside or kept outside not important, but using same prompt)
+            prompt = f"""
+            아래는 오늘 날짜({get_current_date()})의 보험 관련 뉴스 검색 결과이다.
+            이 내용들을 바탕으로 '안프로의 보험 핵심 뉴스 브리핑'에 들어갈 5개의 핵심 뉴스 항목을 JSON 배열 형태로 생성해줘.
+            
+            각 뉴스 항목은 다음 형식을 따라야 해:
+            {{
+                "category": "영문 카테고리 (예: NEW POLICY, MARKET TREND, AI TECH, REGULATION, NEW PRODUCT)",
+                "icon": "Lucide 아이콘 이름 (예: activity, trending-up, bot, shield-alert, brain)",
+                "title": "기사의 핵심을 찌르는 임팩트 있는 제목 (한국어)",
+                "details": ["내용 요약 1", "내용 요약 2", "내용 요약 3"],
+                "insight": "전문가로서의 통찰력이 담긴 한 줄 평 (대표님께 조언하는 스타일)",
+                "link": "기사 원문 URL"
+            }}
 
-    검색 결과:
-    {json.dumps(news_results, ensure_ascii=False)}
+            검색 결과:
+            {json.dumps(news_results, ensure_ascii=False)}
 
-    응답은 반드시 순수 JSON 배열이어야 하며, 다른 설명은 포함하지 마.
-    """
+            응답은 반드시 순수 JSON 배열이어야 하며, 다른 설명은 포함하지 마.
+            """
+            
+            response = model.generate_content(prompt)
+            print(f"Success with {model_name}.", flush=True)
+            break # Success, exit loop
+        except Exception as e:
+            print(f"Failed with {model_name}: {e}", flush=True)
+            continue # Try next model
 
-    try:
-        response = model.generate_content(prompt)
-        print("Gemini response received.", flush=True)
-        # JSON 문자열 추출 (마크다운 코드 블록 제거 등)
-        match = re.search(r'\[.*\]', response.text, re.DOTALL)
-        if match:
-            json_str = match.group()
+    if not response:
+        print("All Gemini models failed.", flush=True)
+        sys.exit(1)
+
+    print("Gemini response received.", flush=True)
+    # JSON 문자열 추출 (마크다운 코드 블록 제거 등)
+    match = re.search(r'\[.*\]', response.text, re.DOTALL)
+    if match:
+        json_str = match.group()
+        try:
             return json.loads(json_str)
-        else:
-            print(f"JSON structure not found in Gemini response: {response.text[:100]}...", flush=True)
-            sys.exit(1) # Fail if JSON parsing fails
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing failed: {e}", flush=True)
+            sys.exit(1)
             return None
-    except Exception as e:
-        print(f"Gemini API or Parsing Error: {e}", flush=True)
-        sys.exit(1) # Fail on Gemini Error
+    else:
+        print(f"JSON structure not found in Gemini response: {response.text[:100]}...", flush=True)
+        sys.exit(1) # Fail if JSON parsing fails
         return None
 
 def update_index_html(new_entry):
