@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import re
 import datetime
@@ -118,6 +119,7 @@ def update_index_html(new_entry):
 if __name__ == "__main__":
     if not GEMINI_API_KEY or not BRAVE_API_KEY:
         print("Error: environment variables GEMINI_API_KEY or BRAVE_API_KEY not set.", flush=True)
+        sys.exit(1)
     else:
         news = fetch_insurance_news()
         if news:
