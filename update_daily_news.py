@@ -54,7 +54,11 @@ def generate_news_entry(news_results):
     print("Generating news entry using Gemini...", flush=True)
     genai.configure(api_key=GEMINI_API_KEY)
     
-    models_to_try = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
+    models_to_try = [
+        "gemini-2.0-flash",     # 최신 & 빠름
+        "gemini-1.5-pro",       # 고성능
+        "gemini-1.5-flash",     # 가성비 & 빠름
+    ]
     model = None
     response = None
 
