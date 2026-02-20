@@ -1,20 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>안프로의 보험 핵심 뉴스 브리핑</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+
         .gradient-text {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
         .glass-header {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
@@ -22,39 +34,43 @@
         }
     </style>
 </head>
+
 <body class="text-slate-800 antialiased">
 
-    <!-- Header -->
     <header class="glass-header fixed w-full top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i data-lucide="shield-check" class="w-8 h-8 text-blue-600"></i>
-                <h1 class="text-xl font-bold tracking-tight text-slate-900">안프로의 <span class="gradient-text">보험 핵심 뉴스</span></h1>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink min-w-0">
+                <i data-lucide="shield-check" class="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 flex-shrink-0"></i>
+                <h1 class="text-[15px] sm:text-xl font-bold tracking-tight text-slate-900 truncate">안프로의 <span
+                        class="gradient-text">보험 핵심 뉴스</span></h1>
             </div>
-            <div class="flex items-center gap-4">
-                 <div class="relative flex items-center gap-2">
-                    <span class="text-xs font-semibold text-slate-500">날짜 선택:</span>
-                    <input type="date" id="datePicker" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
+            <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                <div class="relative flex items-center gap-1.5 sm:gap-2">
+                    <span class="hidden md:inline-block text-xs font-semibold text-slate-500">날짜 선택:</span>
+                    <input type="date" id="datePicker"
+                        class="w-[110px] sm:w-[130px] border border-slate-300 rounded-md sm:rounded-lg px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors bg-white">
                 </div>
                 <!-- GitHub Link (Optional) -->
-                <a href="https://github.com/dfortune11-cmyk/insurance-daily-news-dashboard" target="_blank" class="text-slate-400 hover:text-slate-600 transition-colors" title="GitHub Repository">
+                <a href="https://github.com/dfortune11-cmyk/insurance-daily-news-dashboard" target="_blank"
+                    class="hidden sm:flex text-slate-400 hover:text-slate-600 transition-colors"
+                    title="GitHub Repository">
                     <i data-lucide="github" class="w-5 h-5"></i>
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto min-h-screen">
-        
+    <main class="pt-20 sm:pt-24 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto min-h-screen">
+
         <!-- Date Header -->
-        <div class="mb-8 text-center animate-fade-in relative">
-            <div class="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium mb-3">
-                <i data-lucide="calendar" class="w-4 h-4"></i>
+        <div class="mb-6 sm:mb-8 text-center animate-fade-in relative">
+            <div
+                class="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs sm:text-sm font-medium mb-2.5 sm:mb-3">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                 <span id="currentDateDisplay">Loading...</span>
             </div>
-            <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">오늘의 핵심 브리핑</h2>
-            <p class="text-slate-500">바쁜 당신을 위한 보험 업계 최신 동향 요약</p>
+            <h2 class="text-2xl sm:text-4xl font-bold text-slate-900 mb-1.5 sm:mb-2">오늘의 핵심 브리핑</h2>
+            <p class="text-xs sm:text-base text-slate-500">바쁜 당신을 위한 보험 업계 최신 동향 요약</p>
         </div>
 
         <!-- News Grid -->
@@ -64,7 +80,8 @@
 
         <!-- Empty State (Hidden by default) -->
         <div id="empty-state" class="hidden text-center py-12 animate-fade-in">
-            <div class="bg-slate-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 border border-slate-100">
+            <div
+                class="bg-slate-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 border border-slate-100">
                 <i data-lucide="inbox" class="w-10 h-10 text-slate-300"></i>
             </div>
             <h3 class="text-lg font-bold text-slate-900">해당 날짜의 뉴스가 없습니다</h3>
@@ -84,68 +101,6 @@
     <script>
         // 뉴스 데이터베이스 (자동 업데이트됨)
         const NEWS_DATABASE = {
-            "2026-02-20": [
-                {
-                    "category": "MARKET TREND",
-                    "icon": "trending-up",
-                    "title": "보험업계, 규제 변화 속 수익원 다각화 모색",
-                    "details": [
-                        "소비자보호 강화 기조에 따라 보험사들은 소비자보호 조직을 확대 및 강화.",
-                        "해외진출, 시니어 사업 등 신사업 추진으로 전통적 수익 모델의 한계 극복 시도.",
-                        "데이터와 보험 결합을 통한 맞춤형 상품 개발 필요."
-                    ],
-                    "insight": "대표님, 소비자 중심 경영은 선택이 아닌 필수입니다! 신사업 투자와 데이터 활용에 적극적으로 나서야 합니다.",
-                    "link": "https://www.news2day.co.kr/article/20251231500325"
-                },
-                {
-                    "category": "REGULATION",
-                    "icon": "shield-alert",
-                    "title": "겹겹 규제 속 보험산업 위기 심화",
-                    "details": [
-                        "본업 부진과 규제 강화로 보험사의 수익성 및 건전성이 위협받는 상황.",
-                        "자동차보험 손해율 증가로 보험사들의 수익성 악화.",
-                        "5세대 실손보험이 본업 회복의 히든카드가 될 수 있을지 주목."
-                    ],
-                    "insight": "규제 변화에 민감하게 반응하고, 새로운 수익 모델 발굴에 집중해야 합니다. 5세대 실손보험 판매 전략을 점검하십시오!",
-                    "link": "https://news.nate.com/view/20260107n02652"
-                },
-                {
-                    "category": "REGULATION",
-                    "icon": "shield-alert",
-                    "title": "초고소득 직장인, 건보료 상한액 월 459만원으로 인상",
-                    "details": [
-                        "2026년부터 고소득 직장인의 건강보험료 상한액 인상.",
-                        "월급과 부수입 모두 상한액에 해당하면 월 900만원 이상 건보료 지출.",
-                        "보험료 하한액도 소폭 상승하여 사회적 약자 보호 강화."
-                    ],
-                    "insight": "고소득층을 위한 맞춤형 보험 상품 개발 기회입니다. 세금 및 보험료 변화에 따른 고객 니즈를 파악하십시오.",
-                    "link": "https://www.yna.co.kr/view/AKR20260102078300530"
-                },
-                {
-                    "category": "NEW POLICY",
-                    "icon": "activity",
-                    "title": "실손보험 진화? 보험료↓ 보장↓",
-                    "details": [
-                        "새로운 실손보험 출시로 보험료는 낮아지지만 비급여 항목 보장 축소.",
-                        "도수치료 등 비급여 항목이 전체 보험금의 높은 비중 차지.",
-                        "공적 보험의 역할 축소 및 환자의 민간 보험 의존 심화 우려."
-                    ],
-                    "insight": "실손보험 개편에 따른 소비자 혼란을 최소화하고, 합리적인 보험료와 보장 설계를 제안해야 합니다. 장기적인 관점에서 포트폴리오를 재점검하세요!",
-                    "link": "https://www.ftoday.co.kr/news/articleView.html?idxno=355367"
-                },
-                {
-                    "category": "AI TECH",
-                    "icon": "bot",
-                    "title": "보험사 CEO, 신년 화두는 'AI 전환'",
-                    "details": [
-                        "보험사 CEO들의 신년사에서 소비자 보호 강화, 질적 성장, AI 전환 등이 강조됨.",
-                        "보험손익 변동성 확대 속 투자이익이 보험손익을 앞서는 추세.",
-                        "AI 기반 실질적 성과 창출 및 AI를 활용한 맞춤형 상품 개발 필요."
-                    ],
-                    "insight": "AI 기술 도입은 이제 생존 문제입니다. 전사적인 AI 역량 강화 로드맵을 수립하고, 적극적으로 투자해야 합니다.",
-                    "link": "https://v.daum.net/v/20260107070323747"
-                }
-            ],
             "2026-02-19": [
                 {
                     "category": "NEW POLICY",
@@ -184,16 +139,6 @@
                     "link": "#"
                 }
             ],
-            "2026-02-18": [
-                {
-                    "category": "NEWS",
-                    "icon": "newspaper",
-                    "title": "보험사 2025년 결산 실적 발표: 역대 최대 이익 달성",
-                    "details": ["주요 보험사들이 작년 한 해 역대 최대 규모의 이익을 달성하며 성장세를 이어가고 있습니다."],
-                    "insight": "실적 호조 속에서 사회적 책임과 상생 금융에 대한 목소리도 커질 전망입니다.",
-                    "link": "#"
-                }
-            ]
             // New entries will be appended here by the python script
         };
 
@@ -207,9 +152,9 @@
         function renderNews(date) {
             const newsItems = NEWS_DATABASE[date];
             newsContainer.innerHTML = ''; // Clear existing
-            
+
             // Validate Date for display
-            if(date) {
+            if (date) {
                 currentDateDisplay.textContent = date;
                 datePicker.value = date;
             }
@@ -229,7 +174,7 @@
                 const card = document.createElement('div');
                 card.className = `bg-white rounded-xl p-6 border border-slate-200 shadow-sm transition-all duration-300 card-hover opacity-0 animate-fade-in`;
                 card.style.animation = `fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms forwards`;
-                
+
                 card.innerHTML = `
                     <div class="flex flex-col sm:flex-row gap-4 items-start">
                         <div class="flex-shrink-0">
@@ -262,7 +207,7 @@
                 `;
                 newsContainer.appendChild(card);
             });
-            
+
             // Re-initialize icons for new elements
             lucide.createIcons();
         }
@@ -287,7 +232,7 @@
 
             // 1. Get latest available date
             const latestDate = getLatestDate();
-            
+
             // 2. Render initial state
             if (latestDate) {
                 renderNews(latestDate);
@@ -310,4 +255,5 @@
         });
     </script>
 </body>
+
 </html>
